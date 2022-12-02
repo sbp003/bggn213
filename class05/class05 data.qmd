@@ -1,0 +1,117 @@
+---
+title: "class05: data vis with ggplot"
+author: "Sneha Patel"
+format: pdf
+toc: true 
+---
+
+# Our first plot
+
+R base graphics
+```{r}
+plot(cars)
+```
+ must install and load ggplot2 library before you can use it 
+ install.packages("ggplot2")
+```{r}
+library(ggplot2) 
+```
+
+```{r}
+ggplot(cars)
+```
+ ^ wont work
+ 
+ every ggplot needs at least 3 layers
+ 
+ - **data** (ie the data.frame we have)
+ 
+ - **aes** (the aesthetic mapping of our data to what we want to plot) 
+ 
+ - **geoms** (how we want to plot this stuff)
+
+```{r}
+ggplot(data=cars) +
+  aes(x=speed, y=dist) +
+  geom_point() +
+  geom_smooth(method=lm, se=FALSE)
+```
+# A very cool plot
+```{r}
+url <- "https://bioboot.github.io/bimm143_S20/class-material/up_down_expression.txt"
+genes <- read.delim(url)
+head(genes)
+```
+```{r}
+p <- ggplot(data=genes) + aes(x=Condition1, y=Condition2, col=State) + geom_point(alpha=0.4) 
+p
+```
+
+```{r}
+up_table <- table(genes$State=="up")
+
+up_table[2]
+```
+
+There are `r nrow(genes)` genes in this data set.
+
+There are `r ncol(genes)` columns in this data set, with titles `r colnames(genes)`
+
+Here are how many genes are upregulated: `r up_table[2]`
+
+Fraction of total genes upregulated: `r up_table[2] / nrow(genes) * 100`
+
+```{r}
+p + scale_colour_manual( values=c("pink","gray","turquoise") )
+```
+p + labs(title="Gene response to Drugs", x = "drug", y = "control"
+
+```{r}
+url <- "https://raw.githubusercontent.com/jennybc/gapminder/master/inst/extdata/gapminder.tsv"
+
+gapminder <- read.delim(url)
+
+library(dplyr)
+
+gapminder_2007 <- gapminder %>% filter(year==2007)
+
+ggplot(gapminder_2007) +
+  aes(x=gdpPercap, y=lifeExp, color=continent, size=pop) +
+  geom_point(alpha=0.4)
+```
+
+```{r}
+ggplot(gapminder_2007) + 
+  aes(x = gdpPercap, y = lifeExp, color = pop, size = pop) +
+  geom_point(alpha=0.8) + scale_size_area(max_size=10)
+```
+```{r}
+gapminder_1957 <- gapminder %>% filter(year==1957)
+
+ggplot(gapminder_1957) +
+  aes(x=gdpPercap, y=lifeExp, color=continent, size=pop) +
+  geom_point(alpha=0.7) + scale_size_area(max_size=15) 
+```
+```{r}
+gapminder_1957_2007 <- gapminder %>% filter(year==1957 | year==2007)
+
+ggplot(gapminder_1957_2007) +
+  aes(x=gdpPercap, y=lifeExp, color=continent, size=pop) +
+  geom_point(alpha=0.7) + scale_size_area(max_size=15) + (facet_wrap(~year))
+```
+```{r}
+gapminder_top5 <- gapminder %>% 
+  filter(year==2007) %>% 
+  arrange(desc(pop)) %>% 
+  top_n(5, pop)
+
+ggplot(gapminder_top5) + 
+  aes(x = reorder(country,-lifeExp), y = lifeExp, fill=gdpPercap) + labs(title="Life expectancy of the 5 biggest countries") + geom_col()
+```
+```{r}
+ggplot(mtcars, aes(mpg, disp)) + geom_point()
+```
+```{r}
+ggplot(mtcars) + aes(x=mpg, y=disp) + geom_point()
+```
+
